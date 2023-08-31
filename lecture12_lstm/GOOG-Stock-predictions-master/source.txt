@@ -1,0 +1,3 @@
+extracted from
+
+https://github.com/arditobryan/GOOG-Stock-predictions/tree/master
