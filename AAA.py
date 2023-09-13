@@ -1,28 +1,11 @@
-import numpy as np
-import sys
+def select_two_even_numbers(numbers):
+    # Filter out odd numbers
+    even_numbers = list(filter(lambda x: x % 2 == 0, numbers))
 
-my_arr = np.arange(100000000)
-my_list = list(range(100000000))
+    # Sort the list
+    even_numbers.sort()
 
-# Check memory usage of NumPy array
-numpy_memory_usage = sys.getsizeof(my_arr)
-print(f"Memory usage of NumPy array: {numpy_memory_usage} bytes")
+    # Return the last two elements
+    return even_numbers[-2:]
 
-# Check memory usage of Python list
-list_memory_usage = sys.getsizeof(my_list)
-print(f"Memory usage of Python list: {list_memory_usage} bytes")
-
-
-import numpy as np
-
-# Create a 2D Python list
-data_2d = [[1, 2, 3],
-           [4, 5, 6],
-           [7, 8, 9]]
-
-# Convert the 2D Python list to a NumPy array
-arr_2d = np.array(data_2d)
-
-# Display the 2D NumPy array
-print("2D NumPy Array:")
-print(arr_2d)
+print(select_two_even_numbers)
