@@ -2,7 +2,7 @@
 In this task, the student is expected to generate two new class
 
 To recap, the objective is to create a robot that collect dust. and we want to know how much dirt has been collected
-We can display this
+We can display this. Also we will create a dirt definition that will call the dirt class.
 '''
 
 class Counter:
