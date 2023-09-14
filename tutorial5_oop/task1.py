@@ -9,19 +9,19 @@ Basiclly, you just need to copy paste the code from previous task and change the
 import tkinter as tk
 class Bot:
 
-    def __init__(self,namep,canvasp):
-        self.x = random.randint(100,900)
-        self.y = random.randint(100,900)
-        self.theta = random.uniform(0.0,2.0*math.pi)
+    def __init__(self,namep):
+        # self.x = random.randint(100,900)
+        # self.y = random.randint(100,900)
+        # self.theta = random.uniform(0.0,2.0*math.pi)
         #self.theta = 0
         self.name = namep
-        self.ll = 60 #axle width
-        self.vl = 0.0
-        self.vr = 0.0
-        self.turning = 0
-        self.moving = random.randrange(50,100)
-        self.currentlyTurning = False
-        self.canvas = canvasp
+        # self.ll = 60 #axle width
+        # self.vl = 0.0
+        # self.vr = 0.0
+        # self.turning = 0
+        # self.moving = random.randrange(50,100)
+        # self.currentlyTurning = False
+        # self.canvas = canvasp
 
 
     def make_print_status(status_text):
@@ -97,7 +97,7 @@ class Bot:
         text_x = config["center_x"] + 40
         text_y = config["center_y"]
         canvas.create_text(text_x, text_y, text=config["label"], anchor=tk.W)
-        self.make_print_status(config["label"])
+        # self.make_print_status(config["label"])
 
 def initialise(window):
     window.resizable(False,False)
@@ -112,8 +112,9 @@ def register(canvas,robot_configurations,colors):
     constant_val = 0
     my_th = 500
     # Can suggest student to used zip and enumerate for this part
-    for i, config in enumerate(robot_configurations):
-        bot=Bot(i, canvas, config, condition, colors, my_th)
+    for i, (config,clrx) in enumerate(zip(robot_configurations,colors)):
+        robot_name='c'
+        bot=Bot(robot_name)
         bot.draw(i, canvas, config, condition, colors, my_th)
 
 
@@ -179,7 +180,7 @@ def main():
     window = tk.Tk()
 
     window = initialise(window)
-    window=register(window,robot_configurations,colors)
+    register(window,robot_configurations,colors)
     window.mainloop()
 
 if __name__ == "__main__":
