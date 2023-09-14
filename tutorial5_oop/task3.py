@@ -1,8 +1,8 @@
 '''
-In this task, the student is expected to generate two new class
+Next, lets the light and charger class
 
-To recap, the objective is to create a robot that collect dust. and we want to know how much dirt has been collected
-We can display this. Also we will create a dirt definition that will call the dirt class.
+
+
 '''
 import random
 # class Counter:
@@ -139,7 +139,7 @@ def initialise(window):
     return canvas
 def register(canvas,robot_configurations,colors):
 
-
+    # add the two liness
 
     condition = True
     constant_val = 0
