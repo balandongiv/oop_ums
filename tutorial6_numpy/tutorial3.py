@@ -9,7 +9,7 @@ import random
 import math
 import tkinter as tk
 import numpy as np
-np.random.seed(12345)
+# np.random.seed(12345)
 
 class Counter:
     def __init__(self,canvas):
@@ -134,7 +134,9 @@ class Bot:
         canvas.create_oval(centre1PosX-15,centre1PosY-15, \
                            centre1PosX+15,centre1PosY+15, \
                            fill="gold",tags=self.name)
-        # batteryText = canvas.create_text(self.x,self.y,text=str(self.battery),tags=self.name)
+
+        # Generate the battery text
+        canvas.create_text(self.x,self.y,text=str(self.battery),tags=self.name)
 
         wheel1PosX = self.x - 30*math.sin(self.theta)
         wheel1PosY = self.y + 30*math.cos(self.theta)
@@ -210,6 +212,7 @@ class try_move:
         self.canvas = robot_obj.canvas
         c=1
         # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
+    # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
     def move(self,canvas,registryPassives,dt):
         if self.battery>0:
             self.battery -= 1
@@ -224,6 +227,7 @@ class try_move:
             R = 0
         else:
             R = (self.ll/2.0)*((self.vr+self.vl)/(self.vl-self.vr))
+
         omega = (self.vl-self.vr)/self.ll
         ICCx = self.x-R*math.sin(self.theta) #instantaneous centre of curvature
         ICCy = self.y+R*math.cos(self.theta)
@@ -248,11 +252,33 @@ class try_move:
         if self.x>1000.0:
             self.x = 0.0
         if self.y<0.0:
-            self.y=1000.0
-        if self.y>999.0:
+            self.y=999.0
+        if self.y>1000.0:
             self.y = 0.0
+        #self.updateMap()
         canvas.delete(self.name)
         self.draw(canvas)
+
+    def pickUpAndPutDown(self,xp,yp):
+        self.x = xp
+        self.y = yp
+        self.canvas.delete(self.name)
+        self.draw(self.canvas)
+
+    # def updateMap(self):
+    #     xMapPosition = int(math.floor(self.x/100))
+    #     yMapPosition = int(math.floor(self.y/100))
+    #     self.map[xMapPosition][yMapPosition] = 1
+    #     self.drawMap()
+
+    # def drawMap(self):
+    #     for xx in range(0,10):
+    #         for yy in range(0,10):
+    #             print(xx,",",yy,)
+    #             if self.map[xx][yy]==1:
+    #                 self.canvas.create_rectangle(100*xx,100*yy,100*xx+100,100*yy+100,fill="pink",width=0,tags="map")
+    #     self.canvas.tag_lower("map")
+
 
     def senseCharger(self, registryPassives):
         lightL = 0.0
@@ -267,6 +293,19 @@ class try_move:
                 lightL += 200000/(distanceL*distanceL)
                 lightR += 200000/(distanceR*distanceR)
         return lightL, lightR
+
+    def senseHubs(self, registryPassives):
+        signal = []
+        for pp in registryPassives:
+            if isinstance(pp,WiFiHub):
+                lx,ly = pp.getLocation()
+                distanceL = math.sqrt( (lx-self.sensorPositions[0])*(lx-self.sensorPositions[0]) + \
+                                       (ly-self.sensorPositions[1])*(ly-self.sensorPositions[1]) )
+                distanceR = math.sqrt( (lx-self.sensorPositions[2])*(lx-self.sensorPositions[2]) + \
+                                       (ly-self.sensorPositions[3])*(ly-self.sensorPositions[3]) )
+                signal.append(200000/(distanceL*distanceL))
+                signal.append(200000/(distanceR*distanceR))
+        return signal
 
     def distanceTo(self,obj):
         xx,yy = obj.getLocation()
@@ -302,17 +341,17 @@ class try_move:
             self.currentlyTurning = False
         #battery - these are later so they have priority
         if self.battery<600:
-            if chargerR>chargerL:
-                self.vl = 2.0
-                self.vr = -2.0
-            elif chargerR<chargerL:
-                self.vl = -2.0
-                self.vr = 2.0
-            if abs(chargerR-chargerL)<chargerL*0.1: #approximately the same
-                self.vl = 5.0
-                self.vr = 5.0
-            #self.vl = 5*math.sqrt(chargerR)
-            #self.vr = 5*math.sqrt(chargerL)
+            # if chargerR>chargerL:
+            #     self.vl = 2.0
+            #     self.vr = -2.0
+            # elif chargerR<chargerL:
+            #     self.vl = -2.0
+            #     self.vr = 2.0
+            # if abs(chargerR-chargerL)<chargerL*0.1: #approximately the same
+            #     self.vl = 5.0
+            #     self.vr = 5.0
+            self.vl = 5*math.sqrt(chargerR)
+            self.vr = 5*math.sqrt(chargerL)
         if chargerL+chargerR>200 and self.battery<1000:
             self.vl = 0.0
             self.vr = 0.0
@@ -351,7 +390,7 @@ def buttonClicked(x,y,registryActives):
 def register(canvas):
     registryActives = []
     registryPassives = []
-    noOfBots = 1
+    noOfBots = 30
     noOfDirt = 300
     for i in range(0,noOfBots):
         bot = Bot("Bot"+str(i),canvas)
@@ -380,12 +419,28 @@ def moveIt(canvas,registryActives,registryPassives,count,moves):
         chargerIntensityL, chargerIntensityR = tmx.senseCharger(registryPassives)
         tmx.transferFunction(chargerIntensityL, chargerIntensityR)
         tmx.move(canvas,registryPassives,1.0)
+        ## update back the value
+        rr.battery= tmx.battery
+        rr.canvas= tmx.canvas
+        rr.currentlyTurning= tmx.currentlyTurning
+        rr.ll= tmx.ll
+        rr.moving= tmx.moving
+        rr.name= tmx.name
+        rr.sensorPositions= tmx.sensorPositions
+        rr.theta= tmx.theta
+        rr.turning= tmx.turning
+        rr.vl= tmx.vl
+        rr.vr= tmx.vr
+        rr.x= tmx.x
+        rr.y= tmx.y
+
         registryPassives = tmx.collectDirt(canvas,registryPassives, count)
         numberOfMoves = 5000
+        print(f'The number of moves is {moves}')
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             sys.exit()
-    canvas.after(1,moveIt,canvas,registryActives,registryPassives,count,moves)
+    canvas.after(20,moveIt,canvas,registryActives,registryPassives,count,moves)
 def main():
 
 
