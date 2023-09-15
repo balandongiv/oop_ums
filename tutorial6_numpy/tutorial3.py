@@ -25,8 +25,7 @@ class Dirt:
     def __init__(self,namep):
         self.centreX = np.random.randint(100, 900)
         self.centreY = np.random.randint(100, 900)
-        # self.centreX = random.randint(100,900)
-        # self.centreY = random.randint(100,900)
+
         self.name = namep
 
     def draw(self,canvas):
@@ -211,7 +210,8 @@ class try_move:
         self.draw=robot_obj.draw
         self.canvas = robot_obj.canvas
         c=1
-        # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
+
+
     # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
     def move(self,canvas,registryPassives,dt):
         if self.battery>0:
