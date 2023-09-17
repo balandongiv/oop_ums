@@ -13,23 +13,8 @@ np.random.seed(12345)
 
 
 
-class Dirt:
-    def __init__(self,namep):
-        self.centreX = np.random.randint(100, 900)
-        self.centreY = np.random.randint(100, 900)
-        # self.centreX = random.randint(100,900)
-        # self.centreY = random.randint(100,900)
-        self.name = namep
-
-    def draw(self,canvas):
-        dirt_constant=4
-        body = canvas.create_oval(self.centreX-dirt_constant,self.centreY-dirt_constant, \
-                                  self.centreX+dirt_constant,self.centreY+dirt_constant, \
-                                  fill="grey",tags=self.name)
-
-    def getLocation(self):
-        return self.centreX, self.centreY
-
+from passive_component import Dirt,Counter
+from robot_helper import initialise
 '''
 
 The first task it to create a new class called "Robot" that will be used to represent the robot in the simulation.
@@ -43,16 +28,10 @@ class Bot:
     def __init__(self,namep):
         self.x = np.random.randint(100, 900)
         self.y = np.random.randint(100, 900)
-        self.theta = np.random.uniform(0.0, 2.0 * math.pi)
-        #self.theta = 0
+        # self.theta = np.random.uniform(0.0, 2.0 * math.pi)
+        self.theta = 0
         self.name = namep
-        self.ll = 60 #axle width
-        self.vl = 0.0
-        self.vr = 0.0
-        self.turning = 0
-        self.moving = np.random.randint(50, 101)
-        self.currentlyTurning = False
-        # self.canvas = canvasp
+
 
 
     def make_print_status(status_text):
@@ -100,7 +79,7 @@ class Bot:
     def draw(self,canvas):
 
 
-
+        angle = np.pi / 2.0
         points = [
             (self.x + 30 * np.sin(self.theta)) - 30 * np.sin((angle) - self.theta),
             (self.y - 30 * np.cos(self.theta)) - 30 * np.cos((angle) - self.theta),
@@ -155,11 +134,7 @@ class Bot:
         # canvas.create_text(text_x, text_y, text=config["label"], anchor=tk.W)
 
 
-def initialise(window):
-    window.resizable(False,False)
-    canvas = tk.Canvas(window,width=1000,height=1000)
-    canvas.pack()
-    return canvas
+
 def register(canvas):
 
     # add the two liness
@@ -179,6 +154,7 @@ def register(canvas):
         dirt = Dirt("Dirt"+str(i))
         # registryPassives.append(dirt)
         dirt.draw(canvas)
+    count = Counter(canvas)
 
 def main():
 

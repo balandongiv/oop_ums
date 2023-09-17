@@ -1,15 +1,10 @@
-'''
-
-For week 7, you will be creating a program that will be able to read a file and do some plotting
-'''
-
 import tkinter as tk
 import random
 import math
 import numpy as np
-import sys
 from passive_component import Dirt,Counter
 from robot_helper import initialise, buttonClicked, WiFiHub, Charger
+
 
 
 class Bot:
@@ -37,34 +32,34 @@ class Bot:
                    (self.x - 30*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
                    (self.y + 30*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta), \
                    (self.x + 30*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
-                   (self.y - 30*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta) \
-                   ]
+                   (self.y - 30*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta)  \
+                ]
         canvas.create_polygon(points, fill="blue", tags=self.name)
 
         self.sensorPositions = [ (self.x + 20*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
                                  (self.y - 20*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta), \
                                  (self.x - 20*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
-                                 (self.y + 20*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta) \
-                                 ]
-
-        centre1PosX = self.x
+                                 (self.y + 20*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta)  \
+                            ]
+    
+        centre1PosX = self.x 
         centre1PosY = self.y
-        canvas.create_oval(centre1PosX-15,centre1PosY-15, \
-                           centre1PosX+15,centre1PosY+15, \
+        canvas.create_oval(centre1PosX-15,centre1PosY-15,\
+                           centre1PosX+15,centre1PosY+15,\
                            fill="gold",tags=self.name)
         canvas.create_text(self.x,self.y,text=str(self.battery),tags=self.name)
 
         wheel1PosX = self.x - 30*math.sin(self.theta)
         wheel1PosY = self.y + 30*math.cos(self.theta)
-        canvas.create_oval(wheel1PosX-3,wheel1PosY-3, \
-                           wheel1PosX+3,wheel1PosY+3, \
-                           fill="red",tags=self.name)
+        canvas.create_oval(wheel1PosX-3,wheel1PosY-3,\
+                                         wheel1PosX+3,wheel1PosY+3,\
+                                         fill="red",tags=self.name)
 
         wheel2PosX = self.x + 30*math.sin(self.theta)
         wheel2PosY = self.y - 30*math.cos(self.theta)
-        canvas.create_oval(wheel2PosX-3,wheel2PosY-3, \
-                           wheel2PosX+3,wheel2PosY+3, \
-                           fill="green",tags=self.name)
+        canvas.create_oval(wheel2PosX-3,wheel2PosY-3,\
+                                         wheel2PosX+3,wheel2PosY+3,\
+                                         fill="green",tags=self.name)
 
         sensor1PosX = self.sensorPositions[0]
         sensor1PosY = self.sensorPositions[1]
@@ -76,7 +71,7 @@ class Bot:
         canvas.create_oval(sensor2PosX-3,sensor2PosY-3, \
                            sensor2PosX+3,sensor2PosY+3, \
                            fill="yellow",tags=self.name)
-
+        
     # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
     def move(self,canvas,registryPassives,dt):
         if self.battery>0:
@@ -87,7 +82,7 @@ class Bot:
         for rr in registryPassives:
             if isinstance(rr,Charger) and self.distanceTo(rr)<80:
                 self.battery += 10
-
+                
         if self.vl==self.vr:
             R = 0
         else:
@@ -96,8 +91,8 @@ class Bot:
         ICCx = self.x-R*math.sin(self.theta) #instantaneous centre of curvature
         ICCy = self.y+R*math.cos(self.theta)
         m = np.matrix( [ [math.cos(omega*dt), -math.sin(omega*dt), 0], \
-                         [math.sin(omega*dt), math.cos(omega*dt), 0], \
-                         [0,0,1] ] )
+                        [math.sin(omega*dt), math.cos(omega*dt), 0],  \
+                        [0,0,1] ] )
         v1 = np.matrix([[self.x-ICCx],[self.y-ICCy],[self.theta]])
         v2 = np.matrix([[ICCx],[ICCy],[omega*dt]])
         newv = np.add(np.dot(m,v1),v2)
@@ -107,7 +102,7 @@ class Bot:
         newTheta = newTheta%(2.0*math.pi) #make sure angle doesn't go outside [0.0,2*pi)
         self.x = newX
         self.y = newY
-        self.theta = newTheta
+        self.theta = newTheta        
         if self.vl==self.vr: # straight line movement
             self.x += self.vr*math.cos(self.theta) #vr wlog
             self.y += self.vr*math.sin(self.theta)
@@ -135,7 +130,7 @@ class Bot:
                 lightL += 200000/(distanceL*distanceL)
                 lightR += 200000/(distanceR*distanceR)
         return lightL, lightR
-
+    
     def distanceTo(self,obj):
         xx,yy = obj.getLocation()
         return math.sqrt( math.pow(self.x-xx,2) + math.pow(self.y-yy,2) )
@@ -184,15 +179,19 @@ class Bot:
         if chargerL+chargerR>200 and self.battery<1000:
             self.vl = 0.0
             self.vr = 0.0
+            
 
 
 
 
 
-def register(canvas):
+
+
+
+
+def register(canvas,noOfBots):
     registryActives = []
     registryPassives = []
-    noOfBots = 1
     noOfDirt = 300
     for i in range(0,noOfBots):
         bot = Bot("Bot"+str(i),canvas)
@@ -204,9 +203,12 @@ def register(canvas):
     hub1 = WiFiHub("Hub1",950,50)
     registryPassives.append(hub1)
     hub1.draw(canvas)
-    hub2 = WiFiHub("Hub1",50,500)
+    hub2 = WiFiHub("Hub2",50,500)
     registryPassives.append(hub2)
     hub2.draw(canvas)
+    hub3 = WiFiHub("Hub3",50,500)
+    registryPassives.append(hub3)
+    hub3.draw(canvas)
     for i in range(0,noOfDirt):
         dirt = Dirt("Dirt"+str(i))
         registryPassives.append(dirt)
@@ -215,7 +217,7 @@ def register(canvas):
     canvas.bind( "<Button-1>", lambda event: buttonClicked(event.x,event.y,registryActives) )
     return registryActives, registryPassives, count
 
-def moveIt(canvas,registryActives,registryPassives,count,moves):
+def moveIt(canvas,registryActives,registryPassives,count,moves,window):
     moves += 1
     for rr in registryActives:
         chargerIntensityL, chargerIntensityR = rr.senseCharger(registryPassives)
@@ -225,15 +227,16 @@ def moveIt(canvas,registryActives,registryPassives,count,moves):
         numberOfMoves = 500
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
-            sys.exit()
-    canvas.after(50,moveIt,canvas,registryActives,registryPassives,count,moves)
+            window.destroy()
+    canvas.after(1,moveIt,canvas,registryActives,registryPassives,count,moves,window)
 
-def main():
+def runOneExperiment(noOfBots):
     window = tk.Tk()
     canvas = initialise(window)
-    registryActives, registryPassives, count = register(canvas)
+    registryActives, registryPassives, count = register(canvas,noOfBots)
     moves = 0
-    moveIt(canvas,registryActives,registryPassives, count, moves)
+    moveIt(canvas,registryActives,registryPassives, count, moves,window)
     window.mainloop()
+    return count.dirtCollected
 
-main()
+runOneExperiment(5)

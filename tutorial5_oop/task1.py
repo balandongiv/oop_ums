@@ -7,6 +7,7 @@ Basiclly, you just need to copy paste the code from previous task and change the
 '''
 
 import tkinter as tk
+from robot_helper import initialise
 class Bot:
 
     def __init__(self,namep):
@@ -99,11 +100,7 @@ class Bot:
         canvas.create_text(text_x, text_y, text=config["label"], anchor=tk.W)
         # self.make_print_status(config["label"])
 
-def initialise(window):
-    window.resizable(False,False)
-    canvas = tk.Canvas(window,width=1000,height=1000)
-    canvas.pack()
-    return canvas
+
 def register(canvas,robot_configurations,colors):
 
 

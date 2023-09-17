@@ -4,32 +4,10 @@ In this task, the student is expected to generate two new class
 To recap, the objective is to create a robot that collect dust. and we want to know how much dirt has been collected
 We can display this. Also we will create a dirt definition that will call the dirt class.
 '''
-import random
-# class Counter:
-#     def __init__(self,canvas):
-#         self.dirtCollected = 0
-#         self.canvas = canvas
-#         self.canvas.create_text(70,50,text="Dirt collected: "+str(self.dirtCollected),tags="counter")
-#
-#     def itemCollected(self, canvas):
-#         self.dirtCollected +=1
-#         self.canvas.itemconfigure("counter",text="Dirt collected: "+str(self.dirtCollected))
+from robot_helper import initialise
 
 
-class Dirt:
-    def __init__(self,namep):
-        self.centreX = random.randint(100,900)
-        self.centreY = random.randint(100,900)
-        self.name = namep
 
-    def draw(self,canvas):
-        dirt_constant=4
-        body = canvas.create_oval(self.centreX-dirt_constant,self.centreY-dirt_constant, \
-                                  self.centreX+dirt_constant,self.centreY+dirt_constant, \
-                                  fill="grey",tags=self.name)
-
-    def getLocation(self):
-        return self.centreX, self.centreY
 
 '''
 
@@ -38,23 +16,14 @@ The first task it to create a new class called "Robot" that will be used to repr
 I will provide the following code to get you started:
 Basiclly, you just need to copy paste the code from previous task and change the class name to Robot
 '''
-
+from passive_component import Dirt
 import tkinter as tk
 class Bot:
 
     def __init__(self,namep):
-        # self.x = random.randint(100,900)
-        # self.y = random.randint(100,900)
-        # self.theta = random.uniform(0.0,2.0*math.pi)
-        #self.theta = 0
+
+
         self.name = namep
-        # self.ll = 60 #axle width
-        # self.vl = 0.0
-        # self.vr = 0.0
-        # self.turning = 0
-        # self.moving = random.randrange(50,100)
-        # self.currentlyTurning = False
-        # self.canvas = canvasp
 
 
     def make_print_status(status_text):
@@ -132,11 +101,7 @@ class Bot:
         canvas.create_text(text_x, text_y, text=config["label"], anchor=tk.W)
         # self.make_print_status(config["label"])
 
-def initialise(window):
-    window.resizable(False,False)
-    canvas = tk.Canvas(window,width=1000,height=1000)
-    canvas.pack()
-    return canvas
+
 def register(canvas,robot_configurations,colors):
 
 
