@@ -1,4 +1,4 @@
-from simpleBot2_withCounting_soln import *
+from task1 import *
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.stats import ttest_ind
