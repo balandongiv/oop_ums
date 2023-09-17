@@ -1,23 +1,59 @@
 '''
 
 For week 7, you will be creating a program that will be able to read a file and do some plotting
-'''
 
-import tkinter as tk
+In this file, I already remove the config file.
+
+still not working!!
+
+
+'''
 import random
 import math
+import tkinter as tk
 import numpy as np
-import sys
-from passive_component import Dirt,Counter
-from robot_helper import initialise, buttonClicked, WiFiHub, Charger
+np.random.seed(12345)
 
+class Counter:
+    def __init__(self,canvas):
+        self.dirtCollected = 0
+        self.canvas = canvas
+        self.canvas.create_text(70,50,text="Dirt collected: "+str(self.dirtCollected),tags="counter")
+
+    def itemCollected(self, canvas):
+        self.dirtCollected +=1
+        self.canvas.itemconfigure("counter",text="Dirt collected: "+str(self.dirtCollected))
+
+class Dirt:
+    def __init__(self,namep):
+        self.centreX = np.random.randint(100, 900)
+        self.centreY = np.random.randint(100, 900)
+
+        self.name = namep
+
+    def draw(self,canvas):
+        dirt_constant=4
+        body = canvas.create_oval(self.centreX-dirt_constant,self.centreY-dirt_constant, \
+                                  self.centreX+dirt_constant,self.centreY+dirt_constant, \
+                                  fill="grey",tags=self.name)
+
+    def getLocation(self):
+        return self.centreX, self.centreY
+
+'''
+
+The first task it to create a new class called "Robot" that will be used to represent the robot in the simulation.
+
+I will provide the following code to get you started:
+Basiclly, you just need to copy paste the code from previous task and change the class name to Robot
+'''
 
 class Bot:
 
     def __init__(self,namep,canvasp):
-        self.x = random.randint(100,900)
-        self.y = random.randint(100,900)
-        self.theta = random.uniform(0.0,2.0*math.pi)
+        self.x = np.random.randint(100, 900)
+        self.y = np.random.randint(100, 900)
+        self.theta = np.random.uniform(0.0, 2.0 * math.pi)
         #self.theta = 0
         self.name = namep
         self.ll = 60 #axle width
@@ -25,33 +61,83 @@ class Bot:
         self.vr = 0.0
         self.battery = 1000
         self.turning = 0
-        self.moving = random.randrange(50,100)
+        self.moving = np.random.randint(50, 101)
         self.currentlyTurning = False
         self.canvas = canvasp
 
+
+    def make_print_status(status_text):
+        '''
+        In the first task, I will give an example of how to use the class method. And how you
+        can transfer the function to class method under the class Robot.
+        Specifically, I will transfer the function make_print_status to class method.
+        :return:
+        '''
+        print(f'Successfully create: {status_text}')
+
+    def check_condition_body_color(self,i, condition=True, colors=None):
+        '''
+        In the first task, I will give an example of how to use the class method. And how you
+        can transfer the function to class method under the class Robot.
+        Specifically, I will transfer the function check_condition_body_color.
+        :return:
+        '''
+        if colors is None:
+            colors = {}
+
+        if condition:
+            body_color = colors.get(f"robot{i + 1}", {}).get("body_color", "gray")
+        else:
+            body_color = "gray"  # Default color if condition is False
+        return body_color
+
+    def check_light_color(self,i, config, my_th, colors=None):
+        '''
+        In the first task, I will give an example of how to use the class method. And how you
+        can transfer the function to class method under the class Robot.
+        Specifically, I will transfer the function check_light_color to class method.
+        :return:
+        '''
+
+        if colors is None:
+            colors = {}
+
+        if config["center_x"] >= my_th:
+            body_color_xx = "purple"
+        else:
+            body_color_xx = colors.get(f"robot{i + 1}", {}).get("light_color", "gray")
+        return body_color_xx
+
     def draw(self,canvas):
-        points = [ (self.x + 30*math.sin(self.theta)) - 30*math.sin((math.pi/2.0)-self.theta), \
-                   (self.y - 30*math.cos(self.theta)) - 30*math.cos((math.pi/2.0)-self.theta), \
-                   (self.x - 30*math.sin(self.theta)) - 30*math.sin((math.pi/2.0)-self.theta), \
-                   (self.y + 30*math.cos(self.theta)) - 30*math.cos((math.pi/2.0)-self.theta), \
-                   (self.x - 30*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
-                   (self.y + 30*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta), \
-                   (self.x + 30*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
-                   (self.y - 30*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta) \
-                   ]
+
+
+        angle = np.pi / 2.0
+        points = [
+            (self.x + 30 * np.sin(self.theta)) - 30 * np.sin((angle) - self.theta),
+            (self.y - 30 * np.cos(self.theta)) - 30 * np.cos((angle) - self.theta),
+            (self.x - 30 * np.sin(self.theta)) - 30 * np.sin((angle) - self.theta),
+            (self.y + 30 * np.cos(self.theta)) - 30 * np.cos((angle) - self.theta),
+            (self.x - 30 * np.sin(self.theta)) + 30 * np.sin((angle) - self.theta),
+            (self.y + 30 * np.cos(self.theta)) + 30 * np.cos((angle) - self.theta),
+            (self.x + 30 * np.sin(self.theta)) + 30 * np.sin((angle) - self.theta),
+            (self.y - 30 * np.cos(self.theta)) + 30 * np.cos((angle) - self.theta),
+            ]
         canvas.create_polygon(points, fill="blue", tags=self.name)
 
-        self.sensorPositions = [ (self.x + 20*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
-                                 (self.y - 20*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta), \
-                                 (self.x - 20*math.sin(self.theta)) + 30*math.sin((math.pi/2.0)-self.theta), \
-                                 (self.y + 20*math.cos(self.theta)) + 30*math.cos((math.pi/2.0)-self.theta) \
-                                 ]
+        self.sensorPositions = [
+            (self.x + 20 * np.sin(self.theta)) + 30 * np.sin((math.pi / 2.0) - self.theta),
+            (self.y - 20 * np.cos(self.theta)) + 30 * np.cos((math.pi / 2.0) - self.theta),
+            (self.x - 20 * np.sin(self.theta)) + 30 * np.sin((math.pi / 2.0) - self.theta),
+            (self.y + 20 * np.cos(self.theta)) + 30 * np.cos((math.pi / 2.0) - self.theta),
+            ]
 
         centre1PosX = self.x
         centre1PosY = self.y
         canvas.create_oval(centre1PosX-15,centre1PosY-15, \
                            centre1PosX+15,centre1PosY+15, \
                            fill="gold",tags=self.name)
+
+        # Generate the battery text
         canvas.create_text(self.x,self.y,text=str(self.battery),tags=self.name)
 
         wheel1PosX = self.x - 30*math.sin(self.theta)
@@ -76,6 +162,58 @@ class Bot:
         canvas.create_oval(sensor2PosX-3,sensor2PosY-3, \
                            sensor2PosX+3,sensor2PosY+3, \
                            fill="yellow",tags=self.name)
+        # Maybe in tutorial 2 or 3, we can add logic, say, if number of robot greater than two, then, no need to print the label
+        # text_x = config["center_x"] + 40
+        # text_y = config["center_y"]
+        # canvas.create_text(text_x, text_y, text=config["label"], anchor=tk.W)
+
+class Charger:
+    def __init__(self,namep):
+        self.centreX = random.randint(100,900)
+        self.centreY = random.randint(100,900)
+        self.name = namep
+
+    def draw(self,canvas):
+        body = canvas.create_oval(self.centreX-10,self.centreY-10, \
+                                  self.centreX+10,self.centreY+10, \
+                                  fill="gold",tags=self.name)
+
+    def getLocation(self):
+        return self.centreX, self.centreY
+
+class WiFiHub:
+    def __init__(self,namep,xp,yp):
+        self.centreX = xp
+        self.centreY = yp
+        self.name = namep
+
+    def draw(self,canvas):
+        body = canvas.create_oval(self.centreX-10,self.centreY-10, \
+                                  self.centreX+10,self.centreY+10, \
+                                  fill="purple",tags=self.name)
+
+    def getLocation(self):
+        return self.centreX, self.centreY
+
+class try_move:
+    def __init__(self,robot_obj):
+        hhh=22
+        self.currentlyTurning=robot_obj.currentlyTurning
+        self.ll=robot_obj.ll
+        self.moving=robot_obj.moving
+        self.name=robot_obj.name
+        self.sensorPositions=robot_obj.sensorPositions
+        self.theta=robot_obj.theta
+        self.turning=robot_obj.turning
+        self.vl=robot_obj.vl
+        self.vr=robot_obj.vr
+        self.x=robot_obj.x
+        self.y=robot_obj.y
+        self.battery=robot_obj.battery
+        self.draw=robot_obj.draw
+        self.canvas = robot_obj.canvas
+        c=1
+
 
     # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
     def move(self,canvas,registryPassives,dt):
@@ -92,6 +230,7 @@ class Bot:
             R = 0
         else:
             R = (self.ll/2.0)*((self.vr+self.vl)/(self.vl-self.vr))
+
         omega = (self.vl-self.vr)/self.ll
         ICCx = self.x-R*math.sin(self.theta) #instantaneous centre of curvature
         ICCy = self.y+R*math.cos(self.theta)
@@ -116,11 +255,20 @@ class Bot:
         if self.x>1000.0:
             self.x = 0.0
         if self.y<0.0:
-            self.y=1000.0
-        if self.y>999.0:
+            self.y=999.0
+        if self.y>1000.0:
             self.y = 0.0
+        #self.updateMap()
         canvas.delete(self.name)
         self.draw(canvas)
+
+    def pickUpAndPutDown(self,xp,yp):
+        self.x = xp
+        self.y = yp
+        self.canvas.delete(self.name)
+        self.draw(self.canvas)
+
+
 
     def senseCharger(self, registryPassives):
         lightL = 0.0
@@ -135,6 +283,19 @@ class Bot:
                 lightL += 200000/(distanceL*distanceL)
                 lightR += 200000/(distanceR*distanceR)
         return lightL, lightR
+
+    def senseHubs(self, registryPassives):
+        signal = []
+        for pp in registryPassives:
+            if isinstance(pp,WiFiHub):
+                lx,ly = pp.getLocation()
+                distanceL = math.sqrt( (lx-self.sensorPositions[0])*(lx-self.sensorPositions[0]) + \
+                                       (ly-self.sensorPositions[1])*(ly-self.sensorPositions[1]) )
+                distanceR = math.sqrt( (lx-self.sensorPositions[2])*(lx-self.sensorPositions[2]) + \
+                                       (ly-self.sensorPositions[3])*(ly-self.sensorPositions[3]) )
+                signal.append(200000/(distanceL*distanceL))
+                signal.append(200000/(distanceR*distanceR))
+        return signal
 
     def distanceTo(self,obj):
         xx,yy = obj.getLocation()
@@ -170,29 +331,35 @@ class Bot:
             self.currentlyTurning = False
         #battery - these are later so they have priority
         if self.battery<600:
-            if chargerR>chargerL:
-                self.vl = 2.0
-                self.vr = -2.0
-            elif chargerR<chargerL:
-                self.vl = -2.0
-                self.vr = 2.0
-            if abs(chargerR-chargerL)<chargerL*0.1: #approximately the same
-                self.vl = 5.0
-                self.vr = 5.0
-            #self.vl = 5*math.sqrt(chargerR)
-            #self.vr = 5*math.sqrt(chargerL)
+            # if chargerR>chargerL:
+            #     self.vl = 2.0
+            #     self.vr = -2.0
+            # elif chargerR<chargerL:
+            #     self.vl = -2.0
+            #     self.vr = 2.0
+            # if abs(chargerR-chargerL)<chargerL*0.1: #approximately the same
+            #     self.vl = 5.0
+            #     self.vr = 5.0
+            self.vl = 5*math.sqrt(chargerR)
+            self.vr = 5*math.sqrt(chargerL)
         if chargerL+chargerR>200 and self.battery<1000:
             self.vl = 0.0
             self.vr = 0.0
+def initialise(window):
+    window.resizable(False,False)
+    canvas = tk.Canvas(window,width=1000,height=1000)
+    canvas.pack()
+    return canvas
 
-
-
-
-
+def buttonClicked(x,y,registryActives):
+    for rr in registryActives:
+        if isinstance(rr,Bot):
+            rr.x = x
+            rr.y = y
 def register(canvas):
     registryActives = []
     registryPassives = []
-    noOfBots = 1
+    noOfBots = 30
     noOfDirt = 300
     for i in range(0,noOfBots):
         bot = Bot("Bot"+str(i),canvas)
@@ -214,26 +381,49 @@ def register(canvas):
     count = Counter(canvas)
     canvas.bind( "<Button-1>", lambda event: buttonClicked(event.x,event.y,registryActives) )
     return registryActives, registryPassives, count
-
 def moveIt(canvas,registryActives,registryPassives,count,moves):
     moves += 1
     for rr in registryActives:
-        chargerIntensityL, chargerIntensityR = rr.senseCharger(registryPassives)
-        rr.transferFunction(chargerIntensityL, chargerIntensityR)
-        rr.move(canvas,registryPassives,1.0)
-        registryPassives = rr.collectDirt(canvas,registryPassives, count)
-        numberOfMoves = 500
+        tmx=try_move(rr)
+        chargerIntensityL, chargerIntensityR = tmx.senseCharger(registryPassives)
+        tmx.transferFunction(chargerIntensityL, chargerIntensityR)
+        tmx.move(canvas,registryPassives,1.0)
+        ## update back the value
+        rr.battery= tmx.battery
+        rr.canvas= tmx.canvas
+        rr.currentlyTurning= tmx.currentlyTurning
+        rr.ll= tmx.ll
+        rr.moving= tmx.moving
+        rr.name= tmx.name
+        rr.sensorPositions= tmx.sensorPositions
+        rr.theta= tmx.theta
+        rr.turning= tmx.turning
+        rr.vl= tmx.vl
+        rr.vr= tmx.vr
+        rr.x= tmx.x
+        rr.y= tmx.y
+
+        registryPassives = tmx.collectDirt(canvas,registryPassives, count)
+        numberOfMoves = 5000
+        print(f'The number of moves is {moves}')
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
             sys.exit()
-    canvas.after(50,moveIt,canvas,registryActives,registryPassives,count,moves)
-
+    canvas.after(20,moveIt,canvas,registryActives,registryPassives,count,moves)
 def main():
+
+
     window = tk.Tk()
-    canvas = initialise(window)
-    registryActives, registryPassives, count = register(canvas)
+
+    window = initialise(window)
+    registryActives, registryPassives, count =register(window)
     moves = 0
-    moveIt(canvas,registryActives,registryPassives, count, moves)
+    moveIt(window,registryActives,registryPassives, count, moves)
+
     window.mainloop()
 
-main()
+    ### I need some return value here, so that I can use it in the next function
+
+
+if __name__ == "__main__":
+    main()
