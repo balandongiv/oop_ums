@@ -2,8 +2,8 @@ import tkinter as tk
 import random
 import math
 import numpy as np
-from passive_component import Dirt,Counter
-from robot_helper import initialise, buttonClicked, WiFiHub, Charger
+from passive_component import Dirt,Counter, WiFiHub, Charger
+from robot_helper import initialise, buttonClicked
 
 '''
 This will be the final answer for task 1
