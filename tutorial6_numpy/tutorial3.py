@@ -5,13 +5,14 @@ still not working!!
 
 
 '''
-import random
 import math
 import tkinter as tk
+
 import numpy as np
-# np.random.seed(12345)
-from robot_helper import initialise, buttonClicked, WiFiHub, Charger
-from passive_component import Dirt,Counter
+
+np.random.seed(12345)
+from robot_helper import initialise, buttonClicked
+from passive_component import Dirt,Counter, WiFiHub, Charger
 from dynamic_component import try_move
 
 '''

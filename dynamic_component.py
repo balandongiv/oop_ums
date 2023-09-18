@@ -1,12 +1,13 @@
-import random
 import math
-import tkinter as tk
+import random
+
 import numpy as np
-from passive_component import Dirt,Counter
-from robot_helper import initialise, buttonClicked, WiFiHub, Charger
+
+from passive_component import Dirt, WiFiHub, Charger
+
+
 class try_move:
     def __init__(self,robot_obj):
-        hhh=22
         self.currentlyTurning=robot_obj.currentlyTurning
         self.ll=robot_obj.ll
         self.moving=robot_obj.moving
@@ -21,8 +22,6 @@ class try_move:
         self.battery=robot_obj.battery
         self.draw=robot_obj.draw
         self.canvas = robot_obj.canvas
-        c=1
-        # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
     # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
     def move(self,canvas,registryPassives,dt):
         if self.battery>0:
