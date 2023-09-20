@@ -1,28 +1,21 @@
+'''
+
+We are testing the inheritance of the dynamic component class
+'''
+
 import math
 import random
 
 import numpy as np
-from PIL import Image, ImageTk
 
 from passive_component import Dirt, WiFiHub, Charger
 
+from mybot import Bot
+from dynamic_component import Cat
+class movingCat(Bot):
+    def __init__(self, arithmetic_instance):
+        super().__init__(arithmetic_instance.name, arithmetic_instance.canvas, sensorPositions=arithmetic_instance.sensorPositions, cameraPositions=arithmetic_instance.cameraPositions)
 
-class try_move:
-    def __init__(self,robot_obj):
-        self.currentlyTurning=robot_obj.currentlyTurning
-        self.ll=robot_obj.ll
-        self.moving=robot_obj.moving
-        self.name=robot_obj.name
-        self.sensorPositions=robot_obj.sensorPositions
-        self.theta=robot_obj.theta
-        self.turning=robot_obj.turning
-        self.vl=robot_obj.vl
-        self.vr=robot_obj.vr
-        self.x=robot_obj.x
-        self.y=robot_obj.y
-        self.battery=robot_obj.battery
-        self.draw=robot_obj.draw
-        self.canvas = robot_obj.canvas
     # cf. Dudek and Jenkin, Computational Principles of Mobile Robotics
     def move(self,canvas,registryPassives,dt):
         if self.battery>0:
@@ -69,6 +62,32 @@ class try_move:
         #self.updateMap()
         canvas.delete(self.name)
         self.draw(canvas)
+    def look(self,registryActives):
+        self.view = [0]*9
+        for idx,pos in enumerate(self.cameraPositions):
+            for cc in registryActives:
+                if isinstance(cc,Cat):
+                    dd = self.distanceTo(cc)
+                    scaledDistance = max(400-dd,0)/400
+                    ncx = cc.x-pos[0] #cat if robot were at 0,0
+                    ncy = cc.y-pos[1]
+                    #print(abs(angle-self.theta)%2.0*math.pi)
+                    m = math.tan(self.theta)
+                    A = m*m+1
+                    B = 2*(-m*ncy-ncx)
+                    r = 15 #radius
+                    C = ncy*ncy - r*r + ncx*ncx
+                    if B*B-4*A*C>=0 and scaledDistance>self.view[idx]:
+                        self.view[idx] = scaledDistance
+        self.canvas.delete("view")
+        for vv in range(9):
+            if self.view[vv]==0:
+                self.canvas.create_rectangle(850+vv*15,50,850+vv*15+15,65,fill="white",tags="view")
+            if self.view[vv]>0:
+                colour = hex(15-math.floor(self.view[vv]*16.0)) #scale to 0-15 -> hex
+                fillHex = "#"+colour[2]+colour[2]+colour[2]
+                self.canvas.create_rectangle(850+vv*15,50,850+vv*15+15,65,fill=fillHex,tags="view")
+        return self.view
 
     def pickUpAndPutDown(self,xp,yp):
         self.x = xp
@@ -155,96 +174,12 @@ class try_move:
             self.vl = 0.0
             self.vr = 0.0
 
-class Cat:
-    '''
-    This is a cat. It is a dynamic object. and we only used it during the tutorial 9
-    '''
-    def __init__(self,namep,canvasp):
-        self.x = random.randint(100,900)
-        self.y = random.randint(100,900)
-        self.theta = random.uniform(0.0,2.0*math.pi)
-        self.name = namep
-        self.canvas = canvasp
-        self.vl = 1.0
-        self.vr = 1.0
-        self.turning = 0
-        self.moving = random.randrange(50,100)
-        self.currentlyTurning = False
-        self.ll = 20
-        imgFile = Image.open("cat.png")
-        imgFile = imgFile.resize((30,30), Image.Resampling.LANCZOS)
-        self.image = ImageTk.PhotoImage(imgFile)
-
-    def draw(self,canvas):
-        body = canvas.create_image(self.x,self.y,image=self.image,tags=self.name)
-
-    def getLocation(self):
-        return self.x, self.y
-
-    def transferFunction(self):
-        # wandering behaviour
-        if self.currentlyTurning==True:
-            self.vl = -2.0
-            self.vr = 2.0
-            self.turning -= 1
-        else:
-            self.vl = 1.0
-            self.vr = 1.0
-            self.moving -= 1
-        if self.moving==0 and not self.currentlyTurning:
-            self.turning = random.randrange(20,40)
-            self.currentlyTurning = True
-        if self.turning==0 and self.currentlyTurning:
-            self.moving = random.randrange(50,100)
-            self.currentlyTurning = False
-
-    def move(self,canvas,registryPassives,dt):
-        if self.vl==self.vr:
-            R = 0
-        else:
-            R = (self.ll/2.0)*((self.vr+self.vl)/(self.vl-self.vr))
-        omega = (self.vl-self.vr)/self.ll
-        ICCx = self.x-R*math.sin(self.theta) #instantaneous centre of curvature
-        ICCy = self.y+R*math.cos(self.theta)
-        m = np.matrix( [ [math.cos(omega*dt), -math.sin(omega*dt), 0], \
-                         [math.sin(omega*dt), math.cos(omega*dt), 0], \
-                         [0,0,1] ] )
-        v1 = np.matrix([[self.x-ICCx],[self.y-ICCy],[self.theta]])
-        v2 = np.matrix([[ICCx],[ICCy],[omega*dt]])
-        newv = np.add(np.dot(m,v1),v2)
-        newX = newv.item(0)
-        newY = newv.item(1)
-        newTheta = newv.item(2)
-        newTheta = newTheta%(2.0*math.pi) #make sure angle doesn't go outside [0.0,2*pi)
-        self.x = newX
-        self.y = newY
-        self.theta = newTheta
-        if self.vl==self.vr: # straight line movement
-            self.x += self.vr*math.cos(self.theta) #vr wlog
-            self.y += self.vr*math.sin(self.theta)
-        if self.x<0.0:
-            self.x=999.0
-        if self.x>1000.0:
-            self.x = 0.0
-        if self.y<0.0:
-            self.y=999.0
-        if self.y>1000.0:
-            self.y = 0.0
-        #self.updateMap()
-        canvas.delete(self.name)
-        self.draw(canvas)
-
-    def jump(self):
-        self.x += random.randint(20,50)
-        self.y += random.randint(20,50)
-        if self.x<0.0:
-            self.x=999.0
-        if self.x>1000.0:
-            self.x = 0.0
-        if self.y<0.0:
-            self.y=999.0
-        if self.y>1000.0:
-            self.y = 0.0
-        #self.updateMap()
-        self.canvas.delete(self.name)
-        self.draw(self.canvas)
+    def collision(self,registryActives):
+        collision = False
+        for rr in registryActives:
+            if isinstance(rr,Cat):
+                if self.distanceTo(rr)<50.0:
+                    # playsound("385892__spacether__262312-steffcaffrey-cat-meow1.mp3",block=False)
+                    collision = True
+                    rr.jump()
+        return collision
