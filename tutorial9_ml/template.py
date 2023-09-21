@@ -23,11 +23,13 @@ def buttonClicked(x,y,registryActives):
 
 
 def register(canvas):
+
     registryActives = []
     registryPassives = []
     noOfBots = 1
     noOfCats = 10
     noOfDirt = 300
+
     for i in range(0,noOfBots):
         bot = Bot("Bot"+str(i),canvas)
         registryActives.append(bot)
@@ -75,7 +77,7 @@ def moveIt(canvas,registryActives,registryPassives,count,moves,signalStrengths):
             collision = rr.collision(registryActives)
 
 
-        numberOfMoves = 10000
+        numberOfMoves = 100
         print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
         if moves>numberOfMoves:
             print("total dirt collected in",numberOfMoves,"moves is",count.dirtCollected)
@@ -91,15 +93,15 @@ def training(registryActives, registryPassives,canvas):
         for y in range(1):
             topCornerX = x*100.0
             topCornerY = y*100.0
-            for _ in range(100):
+            for _ in range(5):
                 positionX = topCornerX + random.uniform(0.0,99.99)
                 positionY = topCornerY + random.uniform(0.0,99.99)
                 rr.pickUpAndPutDown(positionX,positionY)
                 signalStrengths.append( (rr.senseHubs(registryPassives),x,y) )
-                canvas.update()
+                # canvas.update()
                 # time.sleep(0.1)
-                print("training",x,y)
 
+    print("Training Completed")
     return signalStrengths
                 
 

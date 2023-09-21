@@ -1,8 +1,4 @@
 import tkinter as tk
-import random
-import math
-import tkinter as tk
-import numpy as np
 
 
 def initialise(window):

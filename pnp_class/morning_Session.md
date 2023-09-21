@@ -136,3 +136,13 @@ Post Exam/Quiz
 
 - https://registrar.ums.edu.my/staff/web/kualiti/prosedur-khusus
 
+1h rec recording equal to 2 SLT
+10 mint video equal to 1 SLT
+
+ Bare minimum requirement for itel
+- 7 activities
+- 4 assessment
+
+H5P good resource
+- Tutorial Group
+- 
