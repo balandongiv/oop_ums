@@ -1,5 +1,5 @@
 import unittest
-from lecture8_debug.my_add_func import add_two_numb as add
+from lecture11_hand_tracing_debug.my_add_func import add_two_numb as add
 class TestAddFunction(unittest.TestCase):
 
     def test_add_positive_numbers(self):
